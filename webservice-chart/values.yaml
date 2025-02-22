@@ -1,0 +1,18 @@
+# Deployment settings
+deployment:
+  replicas: 3
+  image:
+    repository: ghcr.io/mathiseng/podman-project-webservice
+    # Need to change this later to a other tag name
+    tag: 13
+  strategy:
+    type: RollingUpdate
+
+# Service settings
+service:
+  type: LoadBalancer
+  port: 8080
+
+# Ingress settings
+ingress:
+  host: devops-webservice.de

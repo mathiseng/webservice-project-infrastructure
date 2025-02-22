@@ -15,9 +15,9 @@ metadata:
   labels:
     app: webservice
 spec:
-  replicas: 3
+  replicas: {{ .Values.deployment.replicas }}
   strategy:
-    type: "RollingUpdate"
+    type: {{ .Values.deployment.strategy.type }}
   selector:
     matchLabels:
       app: webservice
@@ -30,9 +30,9 @@ spec:
         - name: webservice
           # this is my image i uploaded in the previous tasks to my github packages . Access: Public
           # need to replace this with the latest image in the github registry
-          image: ghcr.io/mathiseng/podman-project-webservice:13
+          image: {{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}
           ports:
-            - containerPort: 8080
+            - containerPort: {{ .Values.service.port }}
           env:
             - name: "HOST"
               value: "0.0.0.0"
@@ -50,9 +50,9 @@ spec:
     app: webservice
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
-  type: "LoadBalancer"
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+  type: {{ .Values.service.type }}
 
 ---
 # For better routes that are accesable in a common way without knowing the specific service port i need Ingress.
@@ -67,7 +67,7 @@ spec:
   ingressClassName: nginx
   rules:
     #To connect to this host i had to map this to the localhost in file /etc/hosts/ as explained in tutorial
-    - host: devops-webservice.de
+    - host: {{ .Values.ingress.host }}
       http:
         paths:
           - pathType: Prefix
@@ -76,4 +76,4 @@ spec:
               service:
                 name: webservice-service
                 port:
-                  number: 8080
+                  number: {{ .Values.service.port }}

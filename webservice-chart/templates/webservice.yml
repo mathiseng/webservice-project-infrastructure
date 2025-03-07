@@ -28,6 +28,10 @@ spec:
     spec:
       containers:
         - name: webservice
+          volumeMounts:
+            - name: redis-password
+              mountPath: /etc/redis
+              readOnly: true
           # this is my image i uploaded in the previous tasks to my github packages . Access: Public
           # need to replace this with the latest image in the github registry
           image: {{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}
@@ -38,7 +42,21 @@ spec:
               value: "0.0.0.0"
             - name: "PORT"
               value: "8080"
-
+            - name: "DB_HOST"
+              value: "redis-master.devops-webservice.svc.cluster.local"
+            - name: "DB_PORT"
+              value: "6379"
+            - name: "DB_NAME"
+              value: "0"  # Default Redis database index
+            - name: "DB_PASSWORD"
+              value: "/etc/redis/redis-password"  # Path to the password file required from application
+      volumes:
+        - name: redis-password
+          secret:
+            secretName: redis-secret
+            items:
+              - key: password
+                path: redis-password
 ---
 apiVersion: v1
 kind: Service

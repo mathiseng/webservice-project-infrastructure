@@ -44,6 +44,28 @@ resource "helm_release" "prometheus" {
 
 }
 
+resource "helm_release" "redis" {
+  name       = "redis"
+  chart      = "oci://registry-1.docker.io/bitnamicharts/redis"
+  namespace  = "devops-webservice"
+  version    = "18.19.2"
+
+  set {
+    name  = "auth.enabled"
+    value = "false"  # simpler for now
+  }
+
+  set {
+    name  = "master.containerPort"
+    value = "6379"
+  }
+
+ # set {
+  #  name  = "architecture"
+   # value = "standalone"
+  #}
+}
+
 #resource "helm_release" "grafana" {
 #  name       = "grafana"
 # namespace  = "monitoring"
